@@ -72,14 +72,26 @@ class Rediska_Connection extends Rediska_Options
                 $flag = STREAM_CLIENT_CONNECT;
             }
 
-            $this->_socket = @stream_socket_client(
-                $socketAddress,
-                $errno,
-                $errmsg,
-                $this->getTimeout(),
-                $flag,
-                $this->getStreamContext()
-            );
+            $streamCtx = $this->getStreamContext();
+            if (is_resource($streamCtx) === true) {
+
+                $this->_socket = @stream_socket_client(
+                    $socketAddress,
+                    $errno,
+                    $errmsg,
+                    $this->getTimeout(),
+                    $flag,
+                    $streamCtx
+                );
+            } else {
+                $this->_socket = @stream_socket_client(
+                    $socketAddress,
+                    $errno,
+                    $errmsg,
+                    $this->getTimeout(),
+                    $flag
+                );
+            }
 
             // Throw exception if can't connect
             if (!is_resource($this->_socket)) {
